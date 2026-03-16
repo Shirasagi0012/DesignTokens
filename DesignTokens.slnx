@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/DesignTokens/DesignTokens.csproj" />
+  <Project Path="tests/DesignTokens.Tests/DesignTokens.Tests.csproj" />
+</Solution>
