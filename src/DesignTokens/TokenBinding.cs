@@ -24,13 +24,13 @@ public static class TokenBinding
         return (target, parentStack);
     }
 
-    public static IObservable<TValue> CreateObservable<TValue, TKey>(
+    public static IObservable<TValue?> CreateObservable<TValue, TKey, TTokenHost>(
         TokenBindingContext context,
         TokenKey<TValue, TKey> key,
-        TValue fallbackValue = default!
-    )
+        TValue? fallbackValue = default!
+    ) where TTokenHost : ITokenHost<TValue, TKey, TTokenHost>
     {
-        return new TokenObservable<TValue, TKey>(context, Application.Current, fallbackValue, ResolveValue);
+        return new TokenObservable<TValue, TKey, TTokenHost>(context, Application.Current, fallbackValue, ResolveValue);
 
         TValue ResolveValue(
             ITokenResolver<TValue, TKey>? resolver,

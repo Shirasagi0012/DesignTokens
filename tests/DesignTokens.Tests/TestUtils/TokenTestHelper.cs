@@ -6,6 +6,10 @@ using DesignTokens.Helpers;
 
 namespace DesignTokens.Tests.TestUtils;
 
+internal sealed class ColorTokenHost : TestTokenHost<Color, object?, ColorTokenHost>;
+
+internal sealed class BrushTokenHost : TestTokenHost<IBrush, object?, BrushTokenHost>;
+
 internal static class TokenTestHelper
 {
     internal static TokenKey<Color, object?> ColorToken { get; } = new(null);
@@ -22,7 +26,7 @@ internal static class TokenTestHelper
         return new FakeTokenResolver(null, null, light, dark);
     }
 
-    internal static Color ResolveColor(TokenHostState<Color, object?> state)
+    internal static Color ResolveColor(TokenHostState<Color, object?, ColorTokenHost> state)
     {
         if (state.Resolver is null)
             throw new InvalidOperationException("Expected a resolver.");
@@ -50,7 +54,7 @@ internal static class TokenTestHelper
             themeVariant,
             null);
 
-        return TokenBinding.CreateObservable(context, ColorToken, fallbackColor);
+        return TokenBinding.CreateObservable<Color, object?, ColorTokenHost>(context, ColorToken, fallbackColor);
     }
 
     internal static void ForceFullGc()

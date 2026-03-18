@@ -16,18 +16,18 @@ public class TokenHostStateBehaviorTests
     {
         var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
         application.RequestedThemeVariant = ThemeVariant.Light;
-        TokenHost<Color, object?>.SetResolver(application, TokenTestHelper.CreateColorResolver(Colors.Blue, Colors.CornflowerBlue));
+        ColorTokenHost.SetResolver(application, TokenTestHelper.CreateColorResolver(Colors.Blue, Colors.CornflowerBlue));
 
         var owner = new Border();
-        TokenHost<Color, object?>.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
+        ColorTokenHost.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
 
         var target = new Border();
-        TokenHost<Color, object?>.SetResolver(target, TokenTestHelper.CreateColorResolver(Colors.Green, Colors.DarkGreen));
+        ColorTokenHost.SetResolver(target, TokenTestHelper.CreateColorResolver(Colors.Green, Colors.DarkGreen));
 
         var provider = new ResourceDictionary();
         ((IResourceProvider)provider).AddOwner(owner);
 
-        using var state = new TokenHostState<Color, object?>(
+        using var state = new TokenHostState<Color, object?, ColorTokenHost>(
             new TokenBindingContext(provider, provider, target, null, null),
             application);
 
@@ -40,17 +40,17 @@ public class TokenHostStateBehaviorTests
     {
         var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
         application.RequestedThemeVariant = ThemeVariant.Light;
-        TokenHost<Color, object?>.SetResolver(application, TokenTestHelper.CreateColorResolver(Colors.Blue, Colors.CornflowerBlue));
+        ColorTokenHost.SetResolver(application, TokenTestHelper.CreateColorResolver(Colors.Blue, Colors.CornflowerBlue));
 
         var owner1 = new Border();
-        TokenHost<Color, object?>.SetResolver(owner1, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
+        ColorTokenHost.SetResolver(owner1, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
 
         var owner2 = new Border();
-        TokenHost<Color, object?>.SetResolver(owner2, TokenTestHelper.CreateColorResolver(Colors.Green, Colors.DarkGreen));
+        ColorTokenHost.SetResolver(owner2, TokenTestHelper.CreateColorResolver(Colors.Green, Colors.DarkGreen));
 
         var provider = new ResourceDictionary();
 
-        using var state = new TokenHostState<Color, object?>(
+        using var state = new TokenHostState<Color, object?, ColorTokenHost>(
             new TokenBindingContext(provider, provider, null, null, null),
             application);
 
@@ -74,9 +74,9 @@ public class TokenHostStateBehaviorTests
     {
         var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
         application.RequestedThemeVariant = ThemeVariant.Light;
-        TokenHost<Color, object?>.SetResolver(application, TokenTestHelper.CreateColorResolver(Colors.Blue, Colors.CornflowerBlue));
+        ColorTokenHost.SetResolver(application, TokenTestHelper.CreateColorResolver(Colors.Blue, Colors.CornflowerBlue));
 
-        using var state = new TokenHostState<Color, object?>(
+        using var state = new TokenHostState<Color, object?, ColorTokenHost>(
             new TokenBindingContext(null, null, null, null, null),
             application);
 
@@ -93,13 +93,13 @@ public class TokenHostStateBehaviorTests
         {
             RequestedThemeVariant = ThemeVariant.Light
         };
-        TokenHost<Color, object?>.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
+        ColorTokenHost.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
 
         var provider = new ResourceDictionary();
         ((IThemeVariantProvider)provider).Key = ThemeVariant.Light;
         ((IResourceProvider)provider).AddOwner(owner);
 
-        using var state = new TokenHostState<Color, object?>(
+        using var state = new TokenHostState<Color, object?, ColorTokenHost>(
             new TokenBindingContext(provider, provider, null, ThemeVariant.Dark, ThemeVariant.Light),
             application);
 
@@ -116,13 +116,13 @@ public class TokenHostStateBehaviorTests
         {
             RequestedThemeVariant = ThemeVariant.Dark
         };
-        TokenHost<Color, object?>.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
+        ColorTokenHost.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
 
         var provider = new ResourceDictionary();
         ((IThemeVariantProvider)provider).Key = ThemeVariant.Light;
         ((IResourceProvider)provider).AddOwner(owner);
 
-        using var state = new TokenHostState<Color, object?>(
+        using var state = new TokenHostState<Color, object?, ColorTokenHost>(
             new TokenBindingContext(provider, provider, null, null, ThemeVariant.Light),
             application);
 
@@ -137,16 +137,16 @@ public class TokenHostStateBehaviorTests
         {
             RequestedThemeVariant = ThemeVariant.Dark
         };
-        TokenHost<Color, object?>.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
+        ColorTokenHost.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
 
-        using var stateWithOwner = new TokenHostState<Color, object?>(
+        using var stateWithOwner = new TokenHostState<Color, object?, ColorTokenHost>(
             new TokenBindingContext(owner, null, owner, null, null),
             null);
 
         Assert.Equal(ThemeVariant.Dark, stateWithOwner.ThemeVariant);
         Assert.Equal(Colors.DarkRed, TokenTestHelper.ResolveColor(stateWithOwner));
 
-        using var stateWithoutHost = new TokenHostState<Color, object?>(
+        using var stateWithoutHost = new TokenHostState<Color, object?, ColorTokenHost>(
             new TokenBindingContext(null, null, null, null, null),
             null);
 

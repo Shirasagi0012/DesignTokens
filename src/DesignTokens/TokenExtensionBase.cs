@@ -5,9 +5,10 @@ using Avalonia.Styling;
 
 namespace DesignTokens;
 
-public static class TokenExtensionHelper<TValue, TKey>
+public static class TokenExtensionHelper<TValue, TKey, TTokenHost>
+    where TTokenHost : ITokenHost<TValue, TKey, TTokenHost>
 {
-    public static IObservable<TValue> ProvideObservable(
+    public static IObservable<TValue?> ProvideObservable(
         IServiceProvider serviceProvider,
         TokenKey<TValue, TKey> tokenKey,
         ThemeVariant? theme,
@@ -18,6 +19,6 @@ public static class TokenExtensionHelper<TValue, TKey>
 
         var targetObject = target.TargetObject as AvaloniaObject;
         var context = TokenBinding.CaptureContext(parentStack, targetObject, theme);
-        return TokenBinding.CreateObservable(context, tokenKey, fallbackValue);
+        return TokenBinding.CreateObservable<TValue, TKey, TTokenHost>(context, tokenKey, fallbackValue);
     }
 }

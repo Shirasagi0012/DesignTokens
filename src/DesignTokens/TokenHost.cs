@@ -2,25 +2,11 @@ using Avalonia;
 
 namespace DesignTokens;
 
-public abstract class TokenHost<TValue, TKey> : AvaloniaObject
+public interface ITokenHost<TValue, TKey, TTokenHost>
+    where TTokenHost : ITokenHost<TValue, TKey, TTokenHost>
 {
-    public static readonly AttachedProperty<ITokenResolver<TValue, TKey>?> ResolverProperty =
-        AvaloniaProperty.RegisterAttached<TokenHost<TValue, TKey>, AvaloniaObject, ITokenResolver<TValue, TKey>?>(
-            "Resolver",
-            inherits: true);
-
-    public static ITokenResolver<TValue, TKey>? GetResolver(AvaloniaObject element)
-    {
-        return element.GetValue(ResolverProperty);
-    }
-
-    public static void SetResolver(AvaloniaObject element, ITokenResolver<TValue, TKey>? value)
-    {
-        element.SetValue(ResolverProperty, value);
-    }
-
-    public static void ClearResolver(AvaloniaObject element)
-    {
-        element.ClearValue(ResolverProperty);
-    }
+    static abstract IObservable<ITokenResolver<TValue, TKey>?> GetTokenObservable(AvaloniaObject element);
+    static abstract ITokenResolver<TValue, TKey>? GetResolver(AvaloniaObject element);
+    static abstract void SetResolver(AvaloniaObject element, ITokenResolver<TValue, TKey>? value);
+    static abstract void ClearResolver(AvaloniaObject element);
 }

@@ -39,14 +39,14 @@ public class TokenBindingContextTests
         {
             RequestedThemeVariant = ThemeVariant.Light
         };
-        TokenHost<Color, object?>.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
+        ColorTokenHost.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
 
         var provider = new ResourceDictionary();
         ((IResourceProvider)provider).AddOwner(owner);
 
         var observer = new RecordingObserver<Color>();
         var context = TokenBinding.CaptureContext(new TestParentStackProvider([provider, owner]), null, null);
-        using var subscription = TokenBinding.CreateObservable(context, TokenTestHelper.ColorToken, Colors.Transparent)
+        using var subscription = TokenBinding.CreateObservable<Color, object?, ColorTokenHost>(context, TokenTestHelper.ColorToken, Colors.Transparent)
             .Subscribe(observer);
 
         Assert.Equal(Colors.Red, observer.Values[^1]);
@@ -59,7 +59,7 @@ public class TokenBindingContextTests
         {
             RequestedThemeVariant = ThemeVariant.Dark
         };
-        TokenHost<Color, object?>.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
+        ColorTokenHost.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
 
         var provider = new ResourceDictionary();
         ((IThemeVariantProvider)provider).Key = ThemeVariant.Light;
@@ -67,7 +67,7 @@ public class TokenBindingContextTests
 
         var observer = new RecordingObserver<Color>();
         var context = TokenBinding.CaptureContext(new TestParentStackProvider([provider, owner]), null, null);
-        using var subscription = TokenBinding.CreateObservable(context, TokenTestHelper.ColorToken, Colors.Transparent)
+        using var subscription = TokenBinding.CreateObservable<Color, object?, ColorTokenHost>(context, TokenTestHelper.ColorToken, Colors.Transparent)
             .Subscribe(observer);
 
         Assert.Equal(Colors.Red, observer.Values[^1]);
@@ -79,11 +79,11 @@ public class TokenBindingContextTests
     {
         var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
         application.RequestedThemeVariant = ThemeVariant.Light;
-        TokenHost<IBrush, object?>.SetResolver(application, null);
+        BrushTokenHost.SetResolver(application, null);
 
         var source = new Border();
         var sourceResolver = TokenTestHelper.CreateBrushResolver(Colors.Red, Colors.DarkRed);
-        TokenHost<IBrush, object?>.SetResolver(source, sourceResolver);
+        BrushTokenHost.SetResolver(source, sourceResolver);
 
         var weakTarget = CreateBoundTargetAndClearBinding(source);
 
@@ -97,19 +97,19 @@ public class TokenBindingContextTests
     {
         var target = new Border();
         var context = TokenBinding.CaptureContext(new TestParentStackProvider([source]), null, null);
-        var binding = TokenBinding.CreateObservable(context, TokenTestHelper.BrushToken, default!).ToBinding();
+        var binding = TokenBinding.CreateObservable<IBrush, object?, BrushTokenHost>(context, TokenTestHelper.BrushToken, default!).ToBinding();
 
         var bindingHandle = target.Bind(Border.BackgroundProperty, binding);
 
         Assert.NotNull(target.Background);
         Assert.Equal(Colors.Red, Assert.IsType<SolidColorBrush>(target.Background).Color);
 
-        TokenHost<IBrush, object?>.SetResolver(source, new FakeTokenResolver(null, null, Colors.Blue, Colors.DarkBlue));
+        BrushTokenHost.SetResolver(source, new FakeTokenResolver(null, null, Colors.Blue, Colors.DarkBlue));
 
         Assert.Equal(Colors.Blue, Assert.IsType<SolidColorBrush>(target.Background).Color);
 
         bindingHandle.Dispose();
-        TokenHost<IBrush, object?>.SetResolver(source, new FakeTokenResolver(null, null, Colors.Green, Colors.DarkGreen));
+        BrushTokenHost.SetResolver(source, new FakeTokenResolver(null, null, Colors.Green, Colors.DarkGreen));
 
         Assert.Null(target.Background);
 

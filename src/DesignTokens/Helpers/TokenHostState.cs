@@ -4,7 +4,8 @@ using Avalonia.Styling;
 
 namespace DesignTokens.Helpers;
 
-internal sealed class TokenHostState<TValue, TKey> : IDisposable
+internal sealed class TokenHostState<TValue, TKey, TTokenHost> : IDisposable 
+    where TTokenHost : ITokenHost<TValue, TKey, TTokenHost>
 {
     private readonly TokenBindingContext _context;
     private readonly Application? _application;
@@ -117,8 +118,8 @@ internal sealed class TokenHostState<TValue, TKey> : IDisposable
         if (HostObject is null)
             return;
 
-        _hostResolverSubscription = HostObject
-            .GetObservable(TokenHost<TValue, TKey>.ResolverProperty)
+        _hostResolverSubscription = TTokenHost
+            .GetTokenObservable(HostObject)
             .Subscribe(new Observer<ITokenResolver<TValue, TKey>?>(OnHostResolverChanged));
     }
 
@@ -130,8 +131,8 @@ internal sealed class TokenHostState<TValue, TKey> : IDisposable
         if (_application is null || ReferenceEquals(HostObject, _application))
             return;
 
-        _applicationResolverSubscription = _application
-            .GetObservable(TokenHost<TValue, TKey>.ResolverProperty)
+        _applicationResolverSubscription = TTokenHost
+            .GetTokenObservable(_application)
             .Subscribe(new Observer<ITokenResolver<TValue, TKey>?>(OnApplicationResolverChanged));
     }
 

@@ -17,7 +17,7 @@ public class TokenBindingLeakTests
     {
         var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
         var resolver = TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed);
-        TokenHost<Color, object?>.SetResolver(application, resolver);
+        ColorTokenHost.SetResolver(application, resolver);
 
         var weakObserver = CreateDisposedObserverFromSourceHost(application);
 
@@ -33,7 +33,7 @@ public class TokenBindingLeakTests
         application.RequestedThemeVariant = ThemeVariant.Light;
 
         var resolver = TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed);
-        TokenHost<Color, object?>.SetResolver(application, resolver);
+        ColorTokenHost.SetResolver(application, resolver);
 
         var weakObserver = CreateDisposedObserverFromApplicationFallback(application);
 
@@ -49,7 +49,7 @@ public class TokenBindingLeakTests
         application.RequestedThemeVariant = ThemeVariant.Light;
 
         var owner = new Border();
-        TokenHost<Color, object?>.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
+        ColorTokenHost.SetResolver(owner, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed));
 
         var provider = new ResourceDictionary();
         ((IResourceProvider)provider).AddOwner(owner);
@@ -66,22 +66,22 @@ public class TokenBindingLeakTests
     {
         var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
         application.RequestedThemeVariant = ThemeVariant.Light;
-        TokenHost<Color, object?>.SetResolver(application, TokenTestHelper.CreateColorResolver(Colors.Blue, Colors.CornflowerBlue));
+        ColorTokenHost.SetResolver(application, TokenTestHelper.CreateColorResolver(Colors.Blue, Colors.CornflowerBlue));
 
         var owner1Resolver = TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed);
         var owner1 = new Border();
-        TokenHost<Color, object?>.SetResolver(owner1, owner1Resolver);
+        ColorTokenHost.SetResolver(owner1, owner1Resolver);
 
         var owner2Resolver = TokenTestHelper.CreateColorResolver(Colors.Green, Colors.DarkGreen);
         var owner2 = new Border();
-        TokenHost<Color, object?>.SetResolver(owner2, owner2Resolver);
+        ColorTokenHost.SetResolver(owner2, owner2Resolver);
 
         var provider = new ResourceDictionary();
         ((IResourceProvider)provider).AddOwner(owner1);
 
         var observer = new RecordingObserver<Color>();
         var context = TokenBinding.CaptureContext(new TestParentStackProvider([provider, owner1]), null, null);
-        using var subscription = TokenBinding.CreateObservable(context, TokenTestHelper.ColorToken, Colors.Transparent)
+        using var subscription = TokenBinding.CreateObservable<Color, object?, ColorTokenHost>(context, TokenTestHelper.ColorToken, Colors.Transparent)
             .Subscribe(observer);
 
         ((IResourceProvider)provider).RemoveOwner(owner1);
@@ -89,11 +89,11 @@ public class TokenBindingLeakTests
 
         var countAfterSwap = observer.Values.Count;
 
-        TokenHost<Color, object?>.SetResolver(owner1, new FakeTokenResolver(Colors.Yellow, Colors.Goldenrod, null, null));
+        ColorTokenHost.SetResolver(owner1, new FakeTokenResolver(Colors.Yellow, Colors.Goldenrod, null, null));
 
         Assert.Equal(countAfterSwap, observer.Values.Count);
 
-        TokenHost<Color, object?>.SetResolver(owner2, new FakeTokenResolver(Colors.Purple, Colors.MediumPurple, null, null));
+        ColorTokenHost.SetResolver(owner2, new FakeTokenResolver(Colors.Purple, Colors.MediumPurple, null, null));
 
         Assert.True(observer.Values.Count > countAfterSwap);
     }
@@ -108,20 +108,20 @@ public class TokenBindingLeakTests
         {
             RequestedThemeVariant = ThemeVariant.Light
         };
-        TokenHost<Color, object?>.SetResolver(owner1, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.Blue));
+        ColorTokenHost.SetResolver(owner1, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.Blue));
 
         var owner2 = new ThemeVariantScope
         {
             RequestedThemeVariant = ThemeVariant.Light
         };
-        TokenHost<Color, object?>.SetResolver(owner2, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.Blue));
+        ColorTokenHost.SetResolver(owner2, TokenTestHelper.CreateColorResolver(Colors.Red, Colors.Blue));
 
         var provider = new ResourceDictionary();
         ((IResourceProvider)provider).AddOwner(owner1);
 
         var observer = new RecordingObserver<Color>();
         var context = TokenBinding.CaptureContext(new TestParentStackProvider([provider, owner1]), null, null);
-        using var subscription = TokenBinding.CreateObservable(context, TokenTestHelper.ColorToken, Colors.Transparent)
+        using var subscription = TokenBinding.CreateObservable<Color, object?, ColorTokenHost>(context, TokenTestHelper.ColorToken, Colors.Transparent)
             .Subscribe(observer);
 
         ((IResourceProvider)provider).RemoveOwner(owner1);
@@ -143,12 +143,12 @@ public class TokenBindingLeakTests
     {
         var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
         application.RequestedThemeVariant = ThemeVariant.Light;
-        TokenHost<Color, object?>.SetResolver(application, null);
+        ColorTokenHost.SetResolver(application, null);
 
         var source = new Border();
         var oldResolver = TokenTestHelper.CreateColorResolver(Colors.Red, Colors.DarkRed);
         var newResolver = TokenTestHelper.CreateColorResolver(Colors.Blue, Colors.DarkBlue);
-        TokenHost<Color, object?>.SetResolver(source, oldResolver);
+        ColorTokenHost.SetResolver(source, oldResolver);
 
         var observer = new RecordingObserver<Color>();
         using var subscription = TokenTestHelper
@@ -157,16 +157,16 @@ public class TokenBindingLeakTests
 
         Assert.Equal(Colors.Red, observer.Values[^1]);
 
-        TokenHost<Color, object?>.SetResolver(source, newResolver);
+        ColorTokenHost.SetResolver(source, newResolver);
 
         Assert.Equal(Colors.Blue, observer.Values[^1]);
         var publishedCountAfterSwap = observer.Values.Count;
 
-        TokenHost<Color, object?>.SetResolver(source, newResolver);
+        ColorTokenHost.SetResolver(source, newResolver);
 
         Assert.Equal(publishedCountAfterSwap, observer.Values.Count);
 
-        TokenHost<Color, object?>.SetResolver(source, new FakeTokenResolver(Colors.Yellow, Colors.Goldenrod, null, null));
+        ColorTokenHost.SetResolver(source, new FakeTokenResolver(Colors.Yellow, Colors.Goldenrod, null, null));
 
         Assert.True(observer.Values.Count > publishedCountAfterSwap);
     }
@@ -181,12 +181,12 @@ public class TokenBindingLeakTests
             .CreateColorObservable(source, null, Colors.Transparent)
             .Subscribe(observer);
 
-        TokenHost<Color, object?>.SetResolver(source, new FakeTokenResolver(Colors.Blue, Colors.CornflowerBlue, null, null));
+        ColorTokenHost.SetResolver(source, new FakeTokenResolver(Colors.Blue, Colors.CornflowerBlue, null, null));
 
         subscription.Dispose();
 
         var publishedCount = observer.Values.Count;
-        TokenHost<Color, object?>.SetResolver(source, new FakeTokenResolver(Colors.Green, Colors.DarkGreen, null, null));
+        ColorTokenHost.SetResolver(source, new FakeTokenResolver(Colors.Green, Colors.DarkGreen, null, null));
 
         Assert.Equal(publishedCount, observer.Values.Count);
 
@@ -200,16 +200,16 @@ public class TokenBindingLeakTests
     {
         var observer = new RecordingObserver<Color>();
         var context = TokenBinding.CaptureContext(new TestParentStackProvider(Array.Empty<object>()), null, null);
-        var subscription = TokenBinding.CreateObservable(context, TokenTestHelper.ColorToken, Colors.Transparent)
+        var subscription = TokenBinding.CreateObservable<Color, object?, ColorTokenHost>(context, TokenTestHelper.ColorToken, Colors.Transparent)
             .Subscribe(observer);
 
-        TokenHost<Color, object?>.SetResolver(application, new FakeTokenResolver(Colors.Blue, Colors.CornflowerBlue, null, null));
+        ColorTokenHost.SetResolver(application, new FakeTokenResolver(Colors.Blue, Colors.CornflowerBlue, null, null));
         application.RequestedThemeVariant = ThemeVariant.Dark;
 
         subscription.Dispose();
 
         var publishedCount = observer.Values.Count;
-        TokenHost<Color, object?>.SetResolver(application, new FakeTokenResolver(Colors.Green, Colors.DarkGreen, null, null));
+        ColorTokenHost.SetResolver(application, new FakeTokenResolver(Colors.Green, Colors.DarkGreen, null, null));
         application.RequestedThemeVariant = ThemeVariant.Light;
 
         Assert.Equal(publishedCount, observer.Values.Count);
@@ -224,7 +224,7 @@ public class TokenBindingLeakTests
     {
         var observer = new RecordingObserver<Color>();
         var context = TokenBinding.CaptureContext(new TestParentStackProvider([provider]), null, null);
-        var subscription = TokenBinding.CreateObservable(context, TokenTestHelper.ColorToken, Colors.Transparent)
+        var subscription = TokenBinding.CreateObservable<Color, object?, ColorTokenHost>(context, TokenTestHelper.ColorToken, Colors.Transparent)
             .Subscribe(observer);
 
         subscription.Dispose();
