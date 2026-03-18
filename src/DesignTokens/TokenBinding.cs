@@ -32,11 +32,11 @@ public static class TokenBinding
     {
         return new TokenObservable<TValue, TKey, TTokenHost>(context, Application.Current, fallbackValue, ResolveValue);
 
-        TValue ResolveValue(
+        TValue? ResolveValue(
             ITokenResolver<TValue, TKey>? resolver,
             ThemeVariant themeVariant,
             AvaloniaObject? hostObject,
-            TValue fallback
+            TValue? fallback
         )
         {
             return resolver is { } && resolver.TryResolve(key, themeVariant, hostObject, out var value) && value is { }

@@ -10,7 +10,7 @@
   <!-- NuGet package metadata -->
   <PropertyGroup>
     <PackageId>DesignTokens.Avalonia</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Shirasagi0012</Authors>
     <Description>A strongly-typed, dynamic design token system for Avalonia. Token values are resolved via typed resolvers and updated through observable bindings, enabling dynamic token-based theming similar to DynamicResource.</Description>
     <PackageTags>avalonia;design-tokens;theming;mvvm</PackageTags>

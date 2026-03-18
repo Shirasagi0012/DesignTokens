@@ -7,7 +7,7 @@ internal sealed class TokenObservable<TValue, TKey, TTokenHost>(
     TokenBindingContext context,
     Application? application,
     TValue? fallbackValue,
-    Func<ITokenResolver<TValue, TKey>?, ThemeVariant, AvaloniaObject?, TValue, TValue?> resolveValue
+    Func<ITokenResolver<TValue, TKey>?, ThemeVariant, AvaloniaObject?, TValue?, TValue?> resolveValue
 ) : IObservable<TValue?>
     where TTokenHost : ITokenHost<TValue, TKey, TTokenHost>
 {
@@ -15,7 +15,7 @@ internal sealed class TokenObservable<TValue, TKey, TTokenHost>(
     private readonly Application? _application = application;
     private readonly TValue? _fallbackValue = fallbackValue;
 
-    private readonly Func<ITokenResolver<TValue, TKey>?, ThemeVariant, AvaloniaObject?, TValue, TValue?> _resolveValue =
+    private readonly Func<ITokenResolver<TValue, TKey>?, ThemeVariant, AvaloniaObject?, TValue?, TValue?> _resolveValue =
         resolveValue;
 
     public IDisposable Subscribe(IObserver<TValue?> observer)
